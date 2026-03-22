@@ -16,7 +16,7 @@ export default function Login() {
     setError('');
     
     try {
-      const response = await api.post('/auth/authenticate', formData);
+      const response = await api.post('/auth/login', formData);
       if (response.data && response.data.token) {
         localStorage.setItem('token', response.data.token);
         // We might want to decode token or just redirect to dashboard
