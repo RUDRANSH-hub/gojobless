@@ -88,7 +88,13 @@ export default function SearchCreators() {
               
               <div className="grid grid-cols-2 gap-2 mb-4">
                 <div className="flex items-center gap-2 text-sm text-gray-300 bg-surface/50 px-3 py-2 rounded-lg">
-                  <Youtube className="text-red-500" size={16} /> {creator.youtubeChannelHandle || 'N/A'}
+                  <Youtube className="text-red-500" size={16} /> 
+                  <div className="flex flex-col">
+                    <span>{creator.youtubeChannelHandle || 'N/A'}</span>
+                    {creator.youtubeSubscribers > 0 && (
+                      <span className="text-xs text-muted">{creator.youtubeSubscribers.toLocaleString()} subs</span>
+                    )}
+                  </div>
                 </div>
                 <div className="flex items-center gap-2 text-sm text-gray-300 bg-surface/50 px-3 py-2 rounded-lg">
                   <Star className="text-yellow-500" size={16} /> {creator.instagramFollowers ? `${(creator.instagramFollowers / 1000).toFixed(1)}k IG` : 'N/A'}
