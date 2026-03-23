@@ -13,14 +13,17 @@ import com.collabstr.backend.repository.InfluencerProfileRepository;
 import com.collabstr.backend.repository.UserRepository;
 import com.collabstr.backend.security.JwtService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import java.util.concurrent.Executors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class AuthenticationService {
 
     private final UserRepository userRepository;
@@ -29,6 +32,7 @@ public class AuthenticationService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
+    private final YouTubeService youTubeService;
 
     @Transactional
     public AuthenticationResponse registerBrand(RegisterBrandRequest request) {
@@ -88,10 +92,21 @@ public class AuthenticationService {
                 .instagramFollowers(request.getInstagramFollowers())
                 .platform(request.getPlatform())
                 .hourlyRate(request.getHourlyRate())
-                // Call YouTube service later or async to sync subscribers
+                // Default to 0, will be updated asynchronously
                 .youtubeSubscribers(0) 
                 .build();
         influencerProfileRepository.save(influencerProfile);
+
+        // Asynchronously fetch subscriber count so it doesn't block registration or fail the transaction
+        if (request.getYoutubeChannelHandle() != null && !request.getYoutubeChannelHandle().isEmpty()) {
+            Executors.newSingleThreadExecutor().submit(() -> {
+                try {
+                    youTubeService.syncSubscribers(user.getId());
+                } catch (Exception e) {
+                    log.error("Failed to sync YouTube subscribers during registration for user {}", user.getId(), e);
+                }
+            });
+        }
 
         var springUser = org.springframework.security.core.userdetails.User.builder()
                 .username(user.getEmail())
