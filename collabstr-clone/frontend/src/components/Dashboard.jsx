@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { LogOut, User as UserIcon, MessageSquare, LayoutDashboard } from 'lucide-react';
+import { LogOut, User as UserIcon, MessageSquare, LayoutDashboard, Youtube } from 'lucide-react';
+import api from '../api/axiosConfig';
 
 export default function Dashboard() {
   const navigate = useNavigate();
   const [token, setToken] = useState(null);
+  const [profile, setProfile] = useState(null);
 
   useEffect(() => {
     const storedToken = localStorage.getItem('token');
@@ -13,6 +15,9 @@ export default function Dashboard() {
       navigate('/login');
     } else {
       setToken(storedToken);
+      api.get('/profile/me')
+        .then(res => setProfile(res.data))
+        .catch(err => console.error("Could not fetch profile", err));
     }
   }, [navigate]);
 
@@ -37,9 +42,9 @@ export default function Dashboard() {
             <UserIcon className="text-white" size={24} />
           </div>
           <div>
-            <h3 className="font-bold text-lg">My Account</h3>
+            <h3 className="font-bold text-lg">{profile?.name || profile?.companyName || 'My Account'}</h3>
             <span className="text-xs text-green-400 flex items-center gap-1">
-              <span className="w-2 h-2 rounded-full bg-green-400 inline-block"></span> Online
+              <span className="w-2 h-2 rounded-full bg-green-400 inline-block"></span> Online {profile?.niche ? `• ${profile.niche}` : ''}
             </span>
           </div>
         </div>
@@ -79,7 +84,7 @@ export default function Dashboard() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <div className="glass-panel rounded-2xl p-6 border border-surface hover:border-primary/50 transition-colors cursor-pointer group">
             <h3 className="text-xl font-bold mb-2 flex items-center justify-between">
               Find Creators <span className="text-primary opacity-0 group-hover:opacity-100 transition-opacity">→</span>
@@ -92,6 +97,19 @@ export default function Dashboard() {
             </h3>
             <p className="text-muted">View your current negotiations, signed contracts, and payment statuses.</p>
           </div>
+
+          {profile?.youtubeChannelHandle && (
+            <div className="glass-panel bg-gradient-to-br from-red-500/10 to-surface rounded-2xl p-6 border border-red-500/30 transition-colors cursor-pointer">
+              <h3 className="text-xl font-bold mb-2 flex items-center gap-2 text-red-400">
+                <Youtube size={24} /> YouTube Stats
+              </h3>
+              <p className="text-white text-2xl font-black mt-4">
+                {profile.youtubeSubscribers > 0 ? profile.youtubeSubscribers.toLocaleString() : 'Syncing...'} 
+                <span className="text-sm font-normal text-muted block">Subscribers</span>
+              </p>
+              <p className="text-xs text-muted mt-2">Channel: {profile.youtubeChannelHandle}</p>
+            </div>
+          )}
         </div>
       </motion.div>
 
