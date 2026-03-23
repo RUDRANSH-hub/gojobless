@@ -18,4 +18,4 @@ jwt:
 
 youtube:
   api:
-    key: ${YOUTUBE_API_KEY: AIzaSyAv6_jqtdOJInpgRkwNhO7sOWwQflvZxOA}
+    key: ${YOUTUBE_API_KEY:AIzaSyAv6_jqtdOJInpgRkwNhO7sOWwQflvZxOA}
