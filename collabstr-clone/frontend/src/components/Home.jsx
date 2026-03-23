@@ -19,7 +19,7 @@ export default function Home() {
           The ultimate platform for seamless collaborations. Find the perfect match, negotiate rates, and grow together in a single, unified workspace.
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-          <Link to="/search/creators">
+          <Link to="/register">
             <motion.button 
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
@@ -28,7 +28,7 @@ export default function Home() {
               Get Started <ArrowRight size={20} />
             </motion.button>
           </Link>
-          <Link to="/search/brands">
+          <Link to="/login">
             <motion.button 
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
